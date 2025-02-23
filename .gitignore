@@ -174,3 +174,5 @@ cython_debug/
 data/
 
 *.properties
+
+node_modules
