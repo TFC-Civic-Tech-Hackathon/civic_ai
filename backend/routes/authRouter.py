@@ -1,3 +1,4 @@
+from datetime import datetime, date
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.security import OAuth2PasswordBearer
@@ -8,6 +9,8 @@ from datetime import datetime, timedelta
 from configs.mongo_configs import mongo_connection
 from models.User import User
 from models.LoginRequest import LoginRequest
+from configs.snowflake_config import snowflake_connection
+from bson import ObjectId
 
 router = APIRouter()
 
@@ -42,6 +45,44 @@ def create_access_token(username: str, userId: str):
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
+def fetch_data(query):
+    """Fetch data from Snowflake"""
+    conn, table_name = snowflake_connection()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    data = cursor.fetchall()
+    columns = [col[0] for col in cursor.description]  # Column names
+    cursor.close()
+    conn.close()
+    return [dict(zip(columns, row)) for row in data]
+
+
+def add_notifications(user_id):
+    db = mongo_connection()
+    query = """SELECT ID, AGENCY, SUB_AGENCY, ACTION_TYPE, SUMMARY, PUBLIC_INSPECTION_PDF_URL, PUBLICATION_DATE   
+            FROM CIVIC_HACKATHON_DB.CIVIC_HACKATHON_SCHEMA.NOTICE_RULE
+            ORDER BY PUBLICATION_DATE DESC
+            LIMIT 5;
+            """
+    data_notification = fetch_data(query)
+    
+    for notification in data_notification:
+        # Convert datetime.date to datetime.datetime properly
+        for key, value in notification.items():
+            if isinstance(value, (date, datetime)):  # Ensure only valid types are checked
+                if isinstance(value, date) and not isinstance(value, datetime):  
+                    notification[key] = datetime(value.year, value.month, value.day)
+
+        # Add user_id field
+        notification["user_id"] = user_id  
+        notification["is_read"] = False  
+
+    collection = db[config["mongodb"]["COLLECTION_NAME_NOTI"]]
+    
+    if data_notification:  # Ensure data is not empty before inserting
+        collection.insert_many(data_notification)
+        
+        
 # Route to handle user signup
 @router.post("/signup")
 async def user_signup(user: User):
@@ -74,6 +115,10 @@ async def user_signup(user: User):
                 {"_id": result.inserted_id})  # Fetch newly created user
 
             if created_user is not None:
+                
+                if created_user["bizzVertical"] in ["Food", "Agriculture"]:
+                    add_notifications(created_user["_id"])
+                
                 return {
                     "message": "User registered successfully",
                     "user": {
@@ -137,3 +182,46 @@ async def login_for_access_token(form_data: LoginRequest):
         }
     else:
         return {"message": "Failed"}
+    
+    
+# @router.get("/notifications/{user_id}")
+# async def get_notifications(user_id: str):
+#     db = mongo_connection()
+#     collection = db[config["mongodb"]["COLLECTION_NAME_NOTI"]]
+#     notifications = collection.find_all({"user_id": user_id})
+#     return {"notifications": notifications}
+
+# Function to convert MongoDB ObjectId and datetime to string for JSON serialization
+def serialize_notification(notification):
+    # Convert ObjectId and datetime fields to strings
+    for key, value in notification.items():
+        if isinstance(value, ObjectId):
+            notification[key] = str(value)
+        elif isinstance(value, (datetime, date)):
+            notification[key] = value.isoformat()  # Convert datetime to ISO 8601 string
+    return notification
+
+@router.get("/notifications/{user_id}")
+async def get_notifications(user_id: str):
+    db = mongo_connection()
+    collection = db[config["mongodb"]["COLLECTION_NAME_NOTI"]]
+    
+    # Query to fetch notifications based on user_id
+    notifications_cursor = collection.find({"user_id": ObjectId(user_id)})
+    
+    # Convert cursor to list and serialize
+    notifications = [serialize_notification(notification) for notification in notifications_cursor]
+    
+    return {"notifications": notifications}
+
+
+
+@router.post("/notifications/read/{notification_id}")
+async def mark_notification_as_read(notification_id: str):
+    db = mongo_connection()
+    collection = db[config["mongodb"]["COLLECTION_NAME_NOTI"]]
+    
+    # Update the notification to mark it as read   
+    collection.update_one({"_id": ObjectId(notification_id)}, {"$set": {"is_read": True}})
+    
+    return {"message": "Notification marked as read"}
