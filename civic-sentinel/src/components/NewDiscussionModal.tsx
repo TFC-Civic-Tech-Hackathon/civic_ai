@@ -5,14 +5,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"; // Adjust import paths as needed
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+// Updated type to include additional fields
 export type DiscussionData = {
   title: string;
   description: string;
   category: string;
+  username: string;
+  creationDate: string;
+  upvotes: number;
+  comments: any[];
+  _id?: string;
 };
 
 type NewDiscussionModalProps = {
@@ -41,7 +47,24 @@ const NewDiscussionModal: React.FC<NewDiscussionModalProps> = ({
   const [newCategory, setNewCategory] = useState<string>(BUSINESS_VERTICALS[0]);
 
   const handlePost = () => {
-    onPost({ title: newTitle, description: newDescription, category: newCategory });
+    // Get username from localStorage (or default to "Anonymous")
+    const storedUser = localStorage.getItem("user");
+    const userData = storedUser ? JSON.parse(storedUser) : null;
+    const username = userData?.username || "Anonymous";
+
+    // Construct the discussion object with the additional fields.
+    const discussion: DiscussionData = {
+      title: newTitle,
+      description: newDescription,
+      category: newCategory,
+      username,
+      creationDate: new Date().toISOString(),
+      upvotes: 0,
+      comments: [],
+    };
+
+    onPost(discussion);
+
     // Reset form fields
     setNewTitle("");
     setNewDescription("");

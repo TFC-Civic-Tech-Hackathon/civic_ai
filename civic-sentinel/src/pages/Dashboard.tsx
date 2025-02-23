@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bell, Search, Shield, TrendingUp, Upload } from "lucide-react";
+import { Bell, Search, Shield, TrendingUp } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { agencyDistribution, policiesPerMonth, subAgencyDistribution } from "@/services/VisualizeService";
-import React from "react";
+import {
+  agencyDistribution,
+  policiesPerMonth,
+  subAgencyDistribution,
+} from "@/services/VisualizeService";
 import {
   BarChart,
   Bar,
@@ -15,8 +18,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { getNotificationByUserId } from "@/services/NotificationService";
 
-// Sample data array
+// Interfaces for chart data
 interface ChartData {
   MONTH_NAME: string;
   POLICY_COUNT: number;
@@ -25,8 +29,8 @@ interface AgencyData {
   AGENCY: string;
   COUNT: number;
 }
-interface AgencyDistributionProps{
-  data: AgencyData[]
+interface AgencyDistributionProps {
+  data: AgencyData[];
 }
 interface ChartComponentProps {
   data: ChartData[];
@@ -35,10 +39,12 @@ interface SubAgencyData {
   SUB_AGENCY: string;
   COUNT: number;
 }
-interface SubAgencyDistributionProps{
-  data: SubAgencyData[]
+interface SubAgencyDistributionProps {
+  data: SubAgencyData[];
 }
-const ChartComponent: React.FC<ChartComponentProps> = ({data}) => {
+
+// Chart Components
+const ChartComponent: React.FC<ChartComponentProps> = ({ data }) => {
   return (
     <div className="p-4">
       <ResponsiveContainer width="100%" height={300}>
@@ -54,7 +60,8 @@ const ChartComponent: React.FC<ChartComponentProps> = ({data}) => {
     </div>
   );
 };
-const AgencyDistribution: React.FC<AgencyDistributionProps> = ({data}) => {
+
+const AgencyDistribution: React.FC<AgencyDistributionProps> = ({ data }) => {
   return (
     <div className="p-4">
       <ResponsiveContainer width="100%" height={300}>
@@ -71,7 +78,7 @@ const AgencyDistribution: React.FC<AgencyDistributionProps> = ({data}) => {
   );
 };
 
-const SubAgencyDistribution: React.FC<SubAgencyDistributionProps> = ({data}) => {
+const SubAgencyDistribution: React.FC<SubAgencyDistributionProps> = ({ data }) => {
   return (
     <div className="p-4">
       <ResponsiveContainer width="100%" height={300}>
@@ -87,56 +94,89 @@ const SubAgencyDistribution: React.FC<SubAgencyDistributionProps> = ({data}) => 
     </div>
   );
 };
-const Dashboard = () => {
+
+// Interface for Notification (adapted to your JSON structure)
+interface Notification {
+  _id: string;
+  ID: string;
+  AGENCY: string;
+  SUB_AGENCY: string;
+  ACTION_TYPE: string;
+  SUMMARY: string;
+  PUBLIC_INSPECTION_PDF_URL: string;
+  PUBLICATION_DATE: string;
+  user_id: string;
+  is_read: boolean;
+}
+
+const stats = [
+  {
+    title: "Active Alerts",
+    value: "5",
+    icon: Bell,
+    description: "New policy updates requiring attention",
+  },
+  {
+    title: "Compliance Score",
+    value: "92%",
+    icon: Shield,
+    description: "Your current compliance rating",
+  },
+  {
+    title: "Policy Impact",
+    value: "Medium",
+    icon: TrendingUp,
+    description: "Potential impact on your business",
+  },
+];
+
+const Dashboard: React.FC = () => {
   const storedUser = localStorage.getItem("user");
   const userData = storedUser ? JSON.parse(storedUser) : null;
   const [searchQuery, setSearchQuery] = useState("");
   const capitalizedUsername =
-  userData.username.charAt(0).toUpperCase() + userData.username.slice(1);
-  const WELCOME_MESSAGE = `Hello, ${capitalizedUsername} ! Your journey to smarter policy tracking and business resilience begins here.`;
-  const STORY_MESSAGE = "Every update is a step on your quest for regulatory mastery – explore the latest insights and turn challenges into opportunities.";
+    userData && userData.username
+      ? userData.username.charAt(0).toUpperCase() + userData.username.slice(1)
+      : "User";
+  const WELCOME_MESSAGE = `Hello, ${capitalizedUsername}! Your journey to smarter policy tracking and business resilience begins here.`;
+  const STORY_MESSAGE =
+    "Every update is a step on your quest for regulatory mastery – explore the latest insights and turn challenges into opportunities.";
+
   const [policiesPerMonthArr, setPoliciesPerMonthArr] = useState<ChartData[]>([]);
   const [agencyData, setAgencyData] = useState<AgencyData[]>([]);
   const [subAgencyData, setSubAgencyData] = useState<SubAgencyData[]>([]);
-
-  const stats = [
-    {
-      title: "Active Alerts",
-      value: "5",
-      icon: Bell,
-      description: "New policy updates requiring attention",
-    },
-    {
-      title: "Compliance Score",
-      value: "92%",
-      icon: Shield,
-      description: "Your current compliance rating",
-    },
-    {
-      title: "Policy Impact",
-      value: "Medium",
-      icon: TrendingUp,
-      description: "Potential impact on your business",
-    },
-  ];
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // await your asynchronous code here, e.g.:
-        const data = await policiesPerMonth();
-        setPoliciesPerMonthArr(data)
+        const polData = await policiesPerMonth();
+        setPoliciesPerMonthArr(polData);
         const agencyDistributionData = await agencyDistribution();
-        setAgencyData(agencyDistributionData)
-        const subAgencyDistributionData =  await subAgencyDistribution();
+        setAgencyData(agencyDistributionData);
+        const subAgencyDistributionData = await subAgencyDistribution();
         setSubAgencyData(subAgencyDistributionData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching chart/distribution data:", error);
       }
     };
-  
+    const fetchNotification = async () => {
+      if (userData && userData.userID) {
+        try {
+          const data = await getNotificationByUserId(userData.userID);
+          console.log("Notification data:", data);
+          // Assume the API returns an object with a property "notifications" that is an array
+          const notificationsArray: Notification[] = data.notifications || [];
+          // Take only the top 3 notifications
+          setNotifications(notificationsArray.slice(0, 3));
+        } catch (error) {
+          console.error("Error fetching notifications:", error);
+        }
+      }
+    };
     fetchData();
-  }, []);
+    fetchNotification();
+  }, [userData]);
 
   return (
     <DashboardLayout>
@@ -157,7 +197,6 @@ const Dashboard = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          {/* Upload Business Documents Section */}
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -178,28 +217,36 @@ const Dashboard = () => {
               </Card>
             ))}
           </div>
-          <ChartComponent data = {policiesPerMonthArr}/>
-          <AgencyDistribution data={agencyData}/>
-          <SubAgencyDistribution data={subAgencyData}/>
-          {/* Recent Alerts */}
+
+          {/* Charts & Distributions */}
+          <ChartComponent data={policiesPerMonthArr} />
+          <AgencyDistribution data={agencyData} />
+          <SubAgencyDistribution data={subAgencyData} />
+
+          {/* Recent Alerts Section */}
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-xl">Recent Alerts</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Placeholder alerts - these would be populated from your backend */}
-                {[1, 2, 3].map((_, i) => (
-                  <div
-                    key={i}
-                    className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
-                  >
-                    <h3 className="font-medium">New Policy Update #{i + 1}</h3>
-                    <p className="text-sm text-gray-600">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </p>
-                  </div>
-                ))}
+                {notifications.length > 0 ? (
+                  notifications.map((notification, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+                    >
+                      <h3 className="font-medium">{notification.ACTION_TYPE}</h3>
+                      <p className="text-sm text-gray-600">
+                        {notification.SUMMARY.length > 100
+                          ? notification.SUMMARY.substring(0, 100) + "..."
+                          : notification.SUMMARY}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-600">No recent alerts available.</p>
+                )}
               </div>
             </CardContent>
           </Card>

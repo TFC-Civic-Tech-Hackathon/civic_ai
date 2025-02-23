@@ -5,17 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ArrowLeft } from "lucide-react";
+import { DiscussionData } from "@/components/NewDiscussionModal";
 
 const DiscussionDetails: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  // Type the discussion object appropriately (this is a simplified example)
-  const discussion = location.state as {
-    title: string;
-    author: string;
-    category: string;
-    timeAgo: string;
-  };
+  // Use the DiscussionData type with an optional id
+  const discussion = location.state as DiscussionData;
+
   const [comment, setComment] = useState<string>("");
   const [comments, setComments] = useState<string[]>([]);
 
@@ -35,22 +32,15 @@ const DiscussionDetails: React.FC = () => {
         </Button>
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold">
-              {discussion.title}
-            </CardTitle>
+            <CardTitle className="text-3xl font-bold">{discussion.title}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 mb-4">
-              By {discussion.author} • {discussion.timeAgo}
+              By {discussion.username} •{" "}
+              {new Date(discussion.creationDate).toLocaleDateString()}
             </p>
             <p className="mb-4">Category: {discussion.category}</p>
-            <p>
-              {/* Placeholder for full discussion content */}
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Suspendisse varius enim in eros elementum tristique. Duis cursus,
-              mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam
-              libero vitae erat.
-            </p>
+            <p>{discussion.description}</p>
           </CardContent>
         </Card>
 

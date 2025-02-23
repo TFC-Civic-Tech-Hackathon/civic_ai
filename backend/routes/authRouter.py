@@ -116,7 +116,7 @@ async def user_signup(user: User):
 
             if created_user is not None:
                 
-                if created_user["bizzVertical"] in ["Food", "Agriculture"]:
+                if created_user["bizzVertical"].lower() in ["food", "agriculture"]:
                     add_notifications(created_user["_id"])
                 
                 return {

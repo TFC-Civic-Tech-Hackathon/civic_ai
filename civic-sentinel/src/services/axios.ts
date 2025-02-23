@@ -1,8 +1,8 @@
 // src/services/api.ts
 import axios from "axios";
 console.log("port",import.meta.env.VITE_API_URL);
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/";
-
+// axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/";
+axios.defaults.baseURL = "http://homelab.chaudharyanshul.com:5000/"
 axios.interceptors.response.use(
   (res) => {
       if (res.status === 200) {

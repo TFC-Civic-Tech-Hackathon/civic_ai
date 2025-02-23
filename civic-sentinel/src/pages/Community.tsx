@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,15 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Users, Search, TrendingUp, MessagesSquare } from "lucide-react";
 import NewDiscussionModal, { DiscussionData } from "@/components/NewDiscussionModal";
 import { useNavigate } from "react-router-dom";
-
-type Discussion = {
-  title: string;
-  author: string;
-  replies: number;
-  views: number;
-  category: string;
-  timeAgo: string;
-};
+import { getAllPosts, post } from "@/services/CommunityServices";
 
 const discussionCategories = [
   {
@@ -35,41 +27,38 @@ const discussionCategories = [
   },
 ];
 
-const recentDiscussions: Discussion[] = [
-  {
-    title: "How to handle new tax regulations?",
-    author: "Sarah Miller",
-    replies: 12,
-    views: 234,
-    category: "Policy Updates",
-    timeAgo: "2h ago",
-  },
-  {
-    title: "Best practices for small business compliance",
-    author: "John Smith",
-    replies: 8,
-    views: 156,
-    category: "Compliance Help",
-    timeAgo: "4h ago",
-  },
-  {
-    title: "Looking for mentorship opportunities",
-    author: "David Chen",
-    replies: 5,
-    views: 98,
-    category: "Business Support",
-    timeAgo: "6h ago",
-  },
-];
-
 const CommunityForum: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [recentDiscussions, setRecentDiscussions] = useState<DiscussionData[]>([]);
   const navigate = useNavigate();
-  
-  const handleNewDiscussionPost = (discussionData: DiscussionData) => {
-    console.log("New Discussion Posted:", discussionData);
-    // Implement API call or state update logic here.
+
+  // Fetch all posts on component mount
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const posts = await getAllPosts();
+        // Ensure posts is an array; otherwise adjust accordingly.
+        setRecentDiscussions(posts);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  // Handler for posting a new discussion
+  const handleNewDiscussionPost = async (discussionData: DiscussionData) => {
+    try {
+      const postResponse = await post(discussionData);
+      console.log("New Discussion Posted:", postResponse);
+      // Prepend the new discussion to the existing list
+      setRecentDiscussions((prev) => [postResponse, ...prev]);
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error posting discussion:", error);
+    }
   };
 
   return (
@@ -80,7 +69,7 @@ const CommunityForum: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Community Forum</h1>
               <p className="text-gray-600">
-                Connect, share, and learn from fellow business owners
+                Connect, share, and learn from fellow business owners.
               </p>
             </div>
             <Button className="shrink-0" onClick={() => setModalOpen(true)}>
@@ -124,7 +113,7 @@ const CommunityForum: React.FC = () => {
                   key={index}
                   className="hover:bg-accent/50 transition-colors cursor-pointer"
                   onClick={() =>
-                    navigate(`/discussion/${index}`, { state: discussion })
+                    navigate(`/discussion/${discussion._id}`, { state: discussion })
                   }
                 >
                   <CardContent className="p-6">
@@ -133,14 +122,16 @@ const CommunityForum: React.FC = () => {
                         <h3 className="font-semibold text-lg">{discussion.title}</h3>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Users className="h-4 w-4" />
-                          <span>{discussion.author}</span>
+                          <span>{discussion.username}</span>
                           <span>•</span>
-                          <span>{discussion.timeAgo}</span>
+                          <span>
+                            {new Date(discussion.creationDate).toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
                       <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        <span className="mr-4">{discussion.replies} replies</span>
-                        <span>{discussion.views} views</span>
+                        <span className="mr-4">{discussion.comments.length} comment{discussion.comments.length !== 1 ? "s" : ""}</span>
+                        <span>{discussion.upvotes} upvote{discussion.upvotes !== 1 ? "s" : ""}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -150,7 +141,10 @@ const CommunityForum: React.FC = () => {
 
             <TabsContent value="categories" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {discussionCategories.map((category, index) => (
-                <Card key={index} className="hover:bg-accent/50 transition-colors cursor-pointer">
+                <Card
+                  key={index}
+                  className="hover:bg-accent/50 transition-colors cursor-pointer"
+                >
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-xl">{category.title}</CardTitle>
