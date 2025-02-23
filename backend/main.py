@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import authRouter, healthRouter, userDocRouter, chatRouter, visualizeRouter, pdfRouter
+from routes import authRouter, healthRouter, userDocRouter, chatRouter, visualizeRouter, pdfRouter, communityRouter
 import configparser
 from fastapi import APIRouter
 
@@ -29,3 +29,4 @@ app.include_router(pdfRouter.router, tags=['pdfRoute'], prefix='/pdf')
 app.include_router(healthRouter.router, tags=['healthRoute'], prefix='')
 app.include_router(chatRouter.router, tags=['chatRoute'], prefix='/query')
 app.include_router(visualizeRouter.router, tags=['visualizeRoute'], prefix='/visualize')
+app.include_router(communityRouter.router, tags=['communityRoute'], prefix='/posts')
