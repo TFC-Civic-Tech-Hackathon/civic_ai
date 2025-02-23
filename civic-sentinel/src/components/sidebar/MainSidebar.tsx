@@ -55,7 +55,7 @@ const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => {
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
           {/* <Menu className="h-6 w-6" /> */}
-          <span className="font-semibold cursor-pointer" onClick={()=> navigate("/dashboard")}>Civic_ai</span>
+          <span className="font-semibold cursor-pointer" onClick={()=> navigate("/dashboard")}>PoliSight.AI</span>
         </div>
         <Button
           variant="ghost"
