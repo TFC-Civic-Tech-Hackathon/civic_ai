@@ -4,13 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Bell, Search, Shield, TrendingUp, Upload } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
-const WELCOME_MESSAGE = "Hello, [Username]! Your journey to smarter policy tracking and business resilience begins here.";
-const STORY_MESSAGE = "Every update is a step on your quest for regulatory mastery – explore the latest insights and turn challenges into opportunities.";
+
 
 const Dashboard = () => {
+  const storedUser = localStorage.getItem("user");
+  const userData = storedUser ? JSON.parse(storedUser) : null;
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadMessage, setUploadMessage] = useState("");
+  const capitalizedUsername =
+  userData.username.charAt(0).toUpperCase() + userData.username.slice(1);
+  const WELCOME_MESSAGE = `Hello, ${capitalizedUsername} ! Your journey to smarter policy tracking and business resilience begins here.`;
+  const STORY_MESSAGE = "Every update is a step on your quest for regulatory mastery – explore the latest insights and turn challenges into opportunities.";
 
   const stats = [
     {
@@ -33,25 +36,7 @@ const Dashboard = () => {
     },
   ];
 
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      setUploadMessage("");
-    }
-  };
 
-  const handleFileUpload = () => {
-    if (!selectedFile) {
-      setUploadMessage("Please select a file to upload.");
-      return;
-    }
-    // Placeholder for file upload logic.
-    // For example, you can use FormData and send it to your backend via fetch or axios.
-    console.log("Uploading file:", selectedFile);
-    setUploadMessage("File uploaded successfully!");
-    // Reset the file input after upload if needed:
-    setSelectedFile(null);
-  };
 
   return (
     <DashboardLayout>
@@ -73,34 +58,7 @@ const Dashboard = () => {
             />
           </div>
           {/* Upload Business Documents Section */}
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-start gap-2">
-                <Upload className="h-5 w-5" /> Upload Business Documents
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-gray-600">
-                Upload your yearly report, profit and loss statement, or any other key business document.
-              </p>
-              <div className="flex items-center space-x-4">
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="border rounded p-2"
-                />
-                <button
-                  onClick={handleFileUpload}
-                  className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
-                >
-                  Upload Document
-                </button>
-              </div>
-              {uploadMessage && (
-                <p className="mt-2 text-sm text-green-600">{uploadMessage}</p>
-              )}
-            </CardContent>
-          </Card>
+
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {stats.map((stat) => (

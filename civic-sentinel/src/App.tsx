@@ -12,6 +12,8 @@ import HomePage from "./pages/Homepage";
 import DiscussionDetails from "./pages/DiscussionDetails";
 import ChatInterface from "./pages/ChatInterface";
 import NotificationsPage from "./pages/NotificationsPage";
+import { Insights } from "./pages/Insights";
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,14 @@ const App = () => (
               <Route
                 path="/civic-bot"
                 element={<ChatInterface/>}
+              />
+              <Route
+                path="/insights"
+                element={<Insights/>}
+              />
+              <Route
+                path="/profile"
+                element={<ProfilePage/>}
               />
               <Route path="/home" element={<HomePage />} />
               <Route path="/discussion/:id" element={<DiscussionDetails />} />

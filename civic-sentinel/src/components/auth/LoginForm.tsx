@@ -5,32 +5,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight } from "lucide-react";
+import { login } from "@/services/authService";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    const response = await login({
+      username:userName,password
+    })
+    if(response){
+      navigate("/dashboard")
+    }
     // TODO: Implement actual login logic
-    toast({
-      title: "Login functionality coming soon",
-      description: "This is a placeholder for the login functionality",
-    });
+    // toast({
+    //   title: "Login functionality coming soon",
+    //   description: "This is a placeholder for the login functionality",
+    // });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-up">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="username">Username</Label>
         <Input
-          id="email"
-          type="email"
-          placeholder="name@company.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="username"
+          type="text"
+          placeholder="username"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
           required
         />
       </div>
