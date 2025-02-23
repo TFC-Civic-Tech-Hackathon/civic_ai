@@ -80,7 +80,7 @@ async def get_all_user_docs(userId: str):
 
     return {"userId": userId, "documents": user_docs}
 
-
+# Get PDF document by its ID
 @router.get("/doc/{userDocId}", response_model=UserDoc)
 async def get_user_doc_by_id(userDocId: str):
     try:

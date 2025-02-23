@@ -25,6 +25,7 @@ app.add_middleware(
 
 app.include_router(authRouter.router, tags=['authRoute'], prefix='/auth')
 app.include_router(userDocRouter.router, tags=['userDocRoute'], prefix='/userDoc')
+app.include_router(pdfRouter.router, tags=['pdfRoute'], prefix='/pdf')
 app.include_router(healthRouter.router, tags=['healthRoute'], prefix='')
 app.include_router(chatRouter.router, tags=['chatRoute'], prefix='/query')
 app.include_router(visualizeRouter.router, tags=['visualizeRoute'], prefix='/visualize')
