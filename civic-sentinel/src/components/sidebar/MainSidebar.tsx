@@ -49,7 +49,6 @@ const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  console.log(theme);
   return (
     <div className="flex h-full flex-col px-4 py-6 border-r border-gray-300">
       <div className="flex items-center justify-between px-2">
