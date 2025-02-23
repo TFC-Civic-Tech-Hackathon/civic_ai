@@ -18,6 +18,8 @@ def scrape_data(url):
     all_results = []
     count = 1
     while True:
+        if count ==2:
+            break
         print(f"Scraping page {count}")
         driver.get(url)
         
