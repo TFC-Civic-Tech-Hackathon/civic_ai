@@ -9,6 +9,7 @@ export const Insights = () => {
   const [uploadMessage, setUploadMessage] = useState("");
   const storedUser = localStorage.getItem("user");
   const userData = storedUser ? JSON.parse(storedUser) : null;
+  console.log(userData)
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
@@ -25,7 +26,7 @@ export const Insights = () => {
     // For example, you can use FormData and send it to your backend via fetch or axios.
     console.log("Uploading file:", selectedFile);
     setUploadMessage("File uploaded successfully!");
-    uploadUserDoc({userId:userData,file:selectedFile})
+    uploadUserDoc({userId:userData.userID,file:selectedFile})
     // Reset the file input after upload if needed:
     setSelectedFile(null);
   };
