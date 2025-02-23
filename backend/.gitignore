@@ -1,0 +1,104 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Pip dependency management
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE / Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and Debugging
+logs/
+*.log
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+.pytest_cache/
+.cache/
+junit.xml
+
+# MyPy cache
+.mypy_cache/
+
+# Database files
+*.sqlite3
+*.db
+*.db-journal
+*.sql
+
+# Environment variables & secrets
+.env
+.env.local
+.env.production
+.env.*.local
+*.secrets
+secrets.json
+*.properties
+
+# Alembic migration cache
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Build files
+build/
+dist/
+*.egg-info/
+.installed.cfg
+MANIFEST
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Sphinx documentation
+docs/_build/
+
+# Terraform / Cloud files
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Node.js dependencies (if using frontend in FastAPI)
+node_modules/
+
+# Yarn / npm lockfiles (if applicable)
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Precompiled TypeScript (if applicable)
+*.tsbuildinfo
+
+# Local development scripts
+prestart.sh
+scripts/*.pyc
+scripts/__pycache__/
+
+# Misc
+*.bak
+*.old
+*.orig

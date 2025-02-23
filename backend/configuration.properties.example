@@ -1,0 +1,4 @@
+[mongodb]
+MONGODB_URL = <value>
+DATABASE_NAME = <value>
+COLLECTION_NAME = <value>
