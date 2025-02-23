@@ -23,22 +23,24 @@ def scrape_data(url):
     all_results = []
     count = 1
     while True:
-        if count ==2:
-            break
+        
+        # if count == 100:
+        #     break
+        
         print(f"Scraping page {count}")
         driver.get(url)
-        
-        # Wait for the page to load
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        if count >= 2:
+            # Wait for the page to load
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
 
-        # Parse HTML
-        html = driver.page_source
-        market_soup = soup(html, 'html.parser')
+            # Parse HTML
+            html = driver.page_source
+            market_soup = soup(html, 'html.parser')
 
-        # Extract data from current page
-        all_tags = market_soup.find_all('div', class_="document-clipping-actions")
-        res = [tags.get('data-document-number') for tags in all_tags]
-        all_results.extend(res)
+            # Extract data from current page
+            all_tags = market_soup.find_all('div', class_="document-clipping-actions")
+            res = [tags.get('data-document-number') for tags in all_tags]
+            all_results.extend(res)
 
         # Try to find the "Next" button
         try:
