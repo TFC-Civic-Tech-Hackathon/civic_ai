@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 import json
 from datetime import datetime
-from configs.snowflake_configs import snowflake_connection
-
-app = FastAPI()
+from configs.snowflake_config import snowflake_connection
+from fastapi import APIRouter
+router = APIRouter()
 
 
 def fetch_data(query):
@@ -17,13 +17,13 @@ def fetch_data(query):
     conn.close()
     return [dict(zip(columns, row)) for row in data]
 
-@app.get("/policies")
+@router.get("/policies")
 def get_policies():
     """Fetch all policies"""
     query = "SELECT * FROM NOTICE_RULE"
     return fetch_data(query)
 
-@app.get("/policies-per-month")
+@router.get("/policies-per-month")
 def get_policies_per_month():
     """Fetch count of new policies per month"""
     query = """
@@ -36,7 +36,7 @@ def get_policies_per_month():
     """
     return fetch_data(query)
 
-@app.get("/agency-distribution")
+@router.get("/agency-distribution")
 def get_agency_distribution():
     """Fetch distribution of policies by agency"""
     query = """
@@ -47,7 +47,7 @@ def get_agency_distribution():
     """
     return fetch_data(query)
 
-@app.get("/sub-agency-distribution")
+@router.get("/sub-agency-distribution")
 def get_sub_agency_distribution():
     """Fetch distribution of policies by sub agency"""
     query = """
