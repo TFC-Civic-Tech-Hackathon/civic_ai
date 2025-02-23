@@ -213,3 +213,15 @@ async def get_notifications(user_id: str):
     notifications = [serialize_notification(notification) for notification in notifications_cursor]
     
     return {"notifications": notifications}
+
+
+
+@router.post("/notifications/read/{notification_id}")
+async def mark_notification_as_read(notification_id: str):
+    db = mongo_connection()
+    collection = db[config["mongodb"]["COLLECTION_NAME_NOTI"]]
+    
+    # Update the notification to mark it as read   
+    collection.update_one({"_id": ObjectId(notification_id)}, {"$set": {"is_read": True}})
+    
+    return {"message": "Notification marked as read"}
