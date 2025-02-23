@@ -3,10 +3,90 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Bell, Search, Shield, TrendingUp, Upload } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { policiesPerMonth } from "@/services/VisualizeService";
+import { agencyDistribution, policiesPerMonth, subAgencyDistribution } from "@/services/VisualizeService";
+import React from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
+// Sample data array
+interface ChartData {
+  MONTH_NAME: string;
+  POLICY_COUNT: number;
+}
+interface AgencyData {
+  AGENCY: string;
+  COUNT: number;
+}
+interface AgencyDistributionProps{
+  data: AgencyData[]
+}
+interface ChartComponentProps {
+  data: ChartData[];
+}
+interface SubAgencyData {
+  SUB_AGENCY: string;
+  COUNT: number;
+}
+interface SubAgencyDistributionProps{
+  data: SubAgencyData[]
+}
+const ChartComponent: React.FC<ChartComponentProps> = ({data}) => {
+  return (
+    <div className="p-4">
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="MONTH_NAME" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="POLICY_COUNT" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+const AgencyDistribution: React.FC<AgencyDistributionProps> = ({data}) => {
+  return (
+    <div className="p-4">
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="AGENCY" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="COUNT" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
-
+const SubAgencyDistribution: React.FC<SubAgencyDistributionProps> = ({data}) => {
+  return (
+    <div className="p-4">
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="SUB_AGENCY" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="COUNT" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 const Dashboard = () => {
   const storedUser = localStorage.getItem("user");
   const userData = storedUser ? JSON.parse(storedUser) : null;
@@ -15,6 +95,9 @@ const Dashboard = () => {
   userData.username.charAt(0).toUpperCase() + userData.username.slice(1);
   const WELCOME_MESSAGE = `Hello, ${capitalizedUsername} ! Your journey to smarter policy tracking and business resilience begins here.`;
   const STORY_MESSAGE = "Every update is a step on your quest for regulatory mastery – explore the latest insights and turn challenges into opportunities.";
+  const [policiesPerMonthArr, setPoliciesPerMonthArr] = useState<ChartData[]>([]);
+  const [agencyData, setAgencyData] = useState<AgencyData[]>([]);
+  const [subAgencyData, setSubAgencyData] = useState<SubAgencyData[]>([]);
 
   const stats = [
     {
@@ -41,9 +124,13 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // await your asynchronous code here, e.g.:
-        const response = await fetch("https://api.example.com/data");
-        const data = await response.json();
-        console.log(data);
+        const data = await policiesPerMonth();
+        setPoliciesPerMonthArr(data)
+        const agencyDistributionData = await agencyDistribution();
+        setAgencyData(agencyDistributionData)
+        const subAgencyDistributionData =  await subAgencyDistribution();
+        console.log(subAgencyDistributionData)
+        setSubAgencyData(subAgencyDistributionData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -92,7 +179,9 @@ const Dashboard = () => {
               </Card>
             ))}
           </div>
-
+          <ChartComponent data = {policiesPerMonthArr}/>
+          <AgencyDistribution data={agencyData}/>
+          <SubAgencyDistribution data={subAgencyData}/>
           {/* Recent Alerts */}
           <Card className="glass-card">
             <CardHeader>
