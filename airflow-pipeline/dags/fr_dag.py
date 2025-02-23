@@ -5,10 +5,14 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from airflow.utils.task_group import TaskGroup
 import pandas as pd
+import asyncio
+
+
 
 from fr_helper.scrape_ids import scrape_data
 from fr_helper.api_call import collect_data
 from fr_helper.load_snowflake import load_to_snowflake
+from fr_helper.load_pdf import load_pdf_data
 
 def extract_data_for_url(url, id, **kwargs):
   data = scrape_data(url=url)
@@ -25,6 +29,10 @@ def load_data_to_snowflake(id, **kwargs):
   data = kwargs['ti'].xcom_pull(task_ids=f'url_tasks.collect_data_{id}', key=f'collected_data_{id}')
   df = pd.DataFrame(data)
   load_to_snowflake(df)
+
+def load_pdf_data_to_pinecone(id, **kwargs):
+  data = kwargs['ti'].xcom_pull(task_ids=f'url_tasks.collect_data_{id}', key=f'collected_data_{id}')
+  load_pdf_data(data)
 
 urls = ["https://www.federalregister.gov/documents/search?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bagencies%5D%5B%5D=food-and-consumer-service&conditions%5Bagencies%5D%5B%5D=food-safety-and-inspection-service&conditions%5Bagencies%5D%5B%5D=food-and-nutrition-service&conditions%5Bagencies%5D%5B%5D=national-institute-of-food-and-agriculture&conditions%5Bagencies%5D%5B%5D=reagan-udall-foundation-for-the-food-and-drug-administration#advanced"]
 
@@ -74,8 +82,16 @@ with TaskGroup("url_tasks", dag=dag) as url_task_group:
       provide_context=True,
       dag=dag,
     )
+    load_pinecone_task = PythonOperator(
+      task_id=f"load_pinecone_data_{i}",
+      python_callable=load_pdf_data_to_pinecone,
+      op_args=[i],
+      provide_context=True,
+      dag=dag,
+    )
     extract_task >> collect_task >> load_task
-    url_tasks.append((extract_task, collect_task, load_task))
+    collect_task >> load_pinecone_task
+    url_tasks.append((extract_task, collect_task, load_task, load_pinecone_task))
 
 # End Task
 end_task = DummyOperator(task_id='end', dag=dag)

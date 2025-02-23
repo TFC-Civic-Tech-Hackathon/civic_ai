@@ -12,6 +12,10 @@ import HomePage from "./pages/Homepage";
 import DiscussionDetails from "./pages/DiscussionDetails";
 import ChatInterface from "./pages/ChatInterface";
 import NotificationsPage from "./pages/NotificationsPage";
+import { Insights } from "./pages/Insights";
+import ProfilePage from "./pages/ProfilePage";
+import PricingPage from "./pages/PricingPage";
+import AboutPage from "./pages/AboutPage";
 
 const queryClient = new QueryClient();
 
@@ -37,16 +41,14 @@ const App = () => (
                 path="/register-business"
                 element={<PlaceholderPage title="Register Business" />}
               />
-              <Route
-                path="/notifications"
-                element={<NotificationsPage/>}
-              />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/community" element={<CommunityForum />} />
-              <Route
-                path="/civic-bot"
-                element={<ChatInterface/>}
-              />
+              <Route path="/civic-bot" element={<ChatInterface />} />
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/pricing" element={<PricingPage />} />
               <Route path="/home" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/discussion/:id" element={<DiscussionDetails />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

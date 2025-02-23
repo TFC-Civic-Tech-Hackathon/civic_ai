@@ -49,39 +49,77 @@ const NotificationsPage: React.FC = () => {
     );
   };
 
+  const unreadNotifications = notifications.filter((n) => !n.read);
+  const readNotifications = notifications.filter((n) => n.read);
+
   return (
     <DashboardLayout>
       <div className="p-8">
-        <h1 className="text-3xl font-bold mb-4">Notifications</h1>
-        <div className="space-y-4">
-          {notifications.map((notification) => (
-            <Card
-              key={notification.id}
-              className="hover:bg-accent/50 transition-colors"
-            >
-              <CardHeader className="flex flex-row items-center gap-2">
-                <Bell className="h-5 w-5 text-primary" />
-                <CardTitle className="text-xl">{notification.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{notification.message}</p>
-                <p className="text-sm text-muted-foreground">
-                  {notification.time}
-                </p>
-              </CardContent>
-              {!notification.read && (
-                <div className="flex justify-end p-4">
-                  <Button
-                    size="sm"
-                    onClick={() => markAsRead(notification.id)}
-                  >
-                    Mark as read
-                  </Button>
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
+        <h1 className="text-3xl font-bold mb-8">Notifications</h1>
+
+        {/* Unread Notifications Section */}
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">Unread Notifications</h2>
+          {unreadNotifications.length > 0 ? (
+            <div className="space-y-4">
+              {unreadNotifications.map((notification) => (
+                <Card
+                  key={notification.id}
+                  className="hover:bg-accent/50 transition-colors"
+                >
+                  <CardHeader className="flex flex-row items-center gap-2">
+                    <Bell className="h-5 w-5 text-primary" />
+                    <CardTitle className="text-xl">{notification.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{notification.message}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {notification.time}
+                    </p>
+                  </CardContent>
+                  <div className="flex justify-end p-4">
+                    <Button
+                      size="sm"
+                      onClick={() => markAsRead(notification.id)}
+                    >
+                      Mark as read
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">No unread notifications.</p>
+          )}
+        </section>
+
+        {/* Read Notifications Section */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Read Notifications</h2>
+          {readNotifications.length > 0 ? (
+            <div className="space-y-4">
+              {readNotifications.map((notification) => (
+                <Card
+                  key={notification.id}
+                  className="hover:bg-accent/50 transition-colors"
+                >
+                  <CardHeader className="flex flex-row items-center gap-2">
+                    <Bell className="h-5 w-5 text-primary" />
+                    <CardTitle className="text-xl">{notification.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{notification.message}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {notification.time}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">No read notifications.</p>
+          )}
+        </section>
       </div>
     </DashboardLayout>
   );

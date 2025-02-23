@@ -5,35 +5,42 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup as soup
+import configparser
 
+config = configparser.ConfigParser()
+config.read('/opt/airflow/dags/configuration.properties')
+
+webdriver_url = config['SCRAPE']['remote_url']
 def scrape_data(url):
     chrome_options = Options()
     chrome_options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Remote(
-        command_executor="http://homelab.chaudharyanshul.com:4443/wd/hub", 
+        command_executor=webdriver_url, 
         options=chrome_options
     )
 
     all_results = []
     count = 1
     while True:
-        if count ==2:
-            break
+        
+        # if count == 100:
+        #     break
+        
         print(f"Scraping page {count}")
         driver.get(url)
-        
-        # Wait for the page to load
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        if count >= 2:
+            # Wait for the page to load
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
 
-        # Parse HTML
-        html = driver.page_source
-        market_soup = soup(html, 'html.parser')
+            # Parse HTML
+            html = driver.page_source
+            market_soup = soup(html, 'html.parser')
 
-        # Extract data from current page
-        all_tags = market_soup.find_all('div', class_="document-clipping-actions")
-        res = [tags.get('data-document-number') for tags in all_tags]
-        all_results.extend(res)
+            # Extract data from current page
+            all_tags = market_soup.find_all('div', class_="document-clipping-actions")
+            res = [tags.get('data-document-number') for tags in all_tags]
+            all_results.extend(res)
 
         # Try to find the "Next" button
         try:

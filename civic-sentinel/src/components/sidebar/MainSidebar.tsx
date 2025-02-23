@@ -12,6 +12,7 @@ import {
   Menu,
   Moon,
   Sun,
+  ChartLine
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "@/components/theme-provider";
@@ -37,6 +38,11 @@ const sidebarItems = [
     icon: Bot,
     href: "/civic-bot",
   },
+  {
+    title: "Insights",
+    icon: ChartLine,
+    href: "/insights",
+  },
 ];
 
 const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => {
@@ -49,7 +55,7 @@ const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => {
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
           {/* <Menu className="h-6 w-6" /> */}
-          <span className="font-semibold cursor-pointer" onClick={()=> navigate("/dashboard")}>Civic_ai</span>
+          <span className="font-semibold cursor-pointer" onClick={()=> navigate("/dashboard")}>PoliSight.AI</span>
         </div>
         <Button
           variant="ghost"

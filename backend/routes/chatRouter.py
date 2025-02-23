@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Add the parent directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-
+from fastapi import APIRouter
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -11,22 +11,13 @@ from pydantic import BaseModel
 from litellm import completion
 import logging
 from configs.ollama_config import OllamaConfig
+router = APIRouter()
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
-app = FastAPI()
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Initialize Ollama configuration
 ollama_config = OllamaConfig()
@@ -35,7 +26,7 @@ ollama_config = OllamaConfig()
 class QueryRequest(BaseModel):
     query: str
 
-@app.post("/query")
+@router.post("/")
 async def process_query(request: QueryRequest):
     try:
         # Test connection first
