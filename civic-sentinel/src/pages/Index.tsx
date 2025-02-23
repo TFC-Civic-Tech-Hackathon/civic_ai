@@ -4,7 +4,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import signupGIF from "@/assets/Business solution.gif"
-const WELCOME_MESSAGE = "Welcome to PolySights.AI – where your business embarks on a journey to navigate the regulatory landscape with the precision of a modern-day wizard. Let us guide you to stay compliant, informed, and ahead of the curve.";
+const WELCOME_MESSAGE = "Welcome to PoliSights.ai – where your business embarks on a journey to navigate the regulatory landscape with the precision of a modern-day wizard. Let us guide you to stay compliant, informed, and ahead of the curve.";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("login");
@@ -25,7 +25,7 @@ const Index = () => {
         {/* Right Side: Login/Sign Up UI */}
         <div className="w-full md:w-1/2 flex flex-col items-center  p-8 overflow-y-scroll">
           <div className="w-full space-y-8 text-center mb-8 animate-fade-down">
-            <h1 className="text-4xl font-bold tracking-tight">PolySights.AI</h1>
+            <h1 className="text-4xl font-bold tracking-tight">PoliSights.ai</h1>
             <p className="text-lg text-gray-600">{WELCOME_MESSAGE}</p>
           </div>
 
