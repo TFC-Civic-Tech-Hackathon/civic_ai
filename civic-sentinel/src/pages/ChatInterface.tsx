@@ -5,10 +5,20 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import axios from "axios";
-
+import { query } from "@/services/ChatService";
+import "./ChatInterface.css";
 type Message = {
   sender: "user" | "bot";
   text: string;
+};
+export const TypingIndicator: React.FC = () => {
+  return (
+    <div className="typing-dots">
+      <span>.</span>
+      <span>.</span>
+      <span>.</span>
+    </div>
+  );
 };
 
 const ChatInterface: React.FC = () => {
@@ -23,32 +33,30 @@ const ChatInterface: React.FC = () => {
 
     try {
       setIsLoading(true);
+
       // Add user message to chat
       const userMessage: Message = { sender: "user", text: input };
-      setMessages(prev => [...prev, userMessage]);
+      setMessages((prev) => [...prev, userMessage]);
 
       // Send query to backend
-      const response = await axios.post("http://localhost:5000/query", {
-        query: input
-      });
-
-      if (response.data.status === "success") {
+      const response = await query(input);
+      if (response) {
         // Add bot response to chat
         const botMessage: Message = {
           sender: "bot",
-          text: response.data.response
+          text: response.response,
         };
-        setMessages(prev => [...prev, botMessage]);
+        setMessages((prev) => [...prev, botMessage]);
       } else {
-        throw new Error(response.data.message);
+        throw new Error(response.message);
       }
     } catch (error) {
       console.error("Error:", error);
       const errorMessage: Message = {
         sender: "bot",
-        text: "Sorry, there was an error processing your request."
+        text: "Sorry, there was an error processing your request.",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setInput("");
       setIsLoading(false);
@@ -57,7 +65,7 @@ const ChatInterface: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-[90vh]">
         {/* Header with Back Button */}
         <header className="flex items-center p-4 border-b">
           <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2">
@@ -80,6 +88,11 @@ const ChatInterface: React.FC = () => {
               {msg.text}
             </div>
           ))}
+          {isLoading ? (
+            <div className="mb-4 p-3 rounded-md max-w-xs bg-white text-gray-800 self-start">
+              <TypingIndicator />
+            </div>
+          ) : null}
         </div>
 
         {/* Input Form */}
@@ -93,7 +106,7 @@ const ChatInterface: React.FC = () => {
               className="flex-grow"
             />
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send"}
+              {"Send"}
             </Button>
           </div>
         </form>

@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import authRouter, healthRouter, userDocRouter
+from routes import authRouter, healthRouter, userDocRouter, chatRouter
 import configparser
+from fastapi import APIRouter
 
 config = configparser.ConfigParser()
 config.read("configuration.properties")
@@ -25,3 +26,4 @@ app.add_middleware(
 app.include_router(authRouter.router, tags=['authRoute'], prefix='/auth')
 app.include_router(userDocRouter.router, tags=['userDocRoute'], prefix='/userDoc')
 app.include_router(healthRouter.router, tags=['healthRoute'], prefix='')
+app.include_router(chatRouter.router, tags=['chatRoute'], prefix='/query')
