@@ -129,7 +129,6 @@ const Dashboard = () => {
         const agencyDistributionData = await agencyDistribution();
         setAgencyData(agencyDistributionData)
         const subAgencyDistributionData =  await subAgencyDistribution();
-        console.log(subAgencyDistributionData)
         setSubAgencyData(subAgencyDistributionData);
       } catch (error) {
         console.error("Error fetching data:", error);
