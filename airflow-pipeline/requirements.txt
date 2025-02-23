@@ -7,3 +7,6 @@ selenium==4.28.1
 splinter==0.21.0
 webdriver-manager==4.0.2
 snowflake-connector-python
+PyPDF2
+pinecone
+litellm
