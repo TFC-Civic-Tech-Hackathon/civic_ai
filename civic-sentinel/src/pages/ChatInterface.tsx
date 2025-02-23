@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import axios from "axios";
 
 type Message = {
   sender: "user" | "bot";
@@ -14,19 +15,43 @@ const ChatInterface: React.FC = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleSend = () => {
-    if (input.trim()) {
-      const newMessage: Message = { sender: "user", text: input };
-      setMessages((prev) => [...prev, newMessage]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    try {
+      setIsLoading(true);
+      // Add user message to chat
+      const userMessage: Message = { sender: "user", text: input };
+      setMessages(prev => [...prev, userMessage]);
+
+      // Send query to backend
+      const response = await axios.post("http://localhost:5000/query", {
+        query: input
+      });
+
+      if (response.data.status === "success") {
+        // Add bot response to chat
+        const botMessage: Message = {
+          sender: "bot",
+          text: response.data.response
+        };
+        setMessages(prev => [...prev, botMessage]);
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      const errorMessage: Message = {
+        sender: "bot",
+        text: "Sorry, there was an error processing your request."
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setInput("");
-      // Optionally simulate a bot response:
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          { sender: "bot", text: "This is a simulated response." },
-        ]);
-      }, 1000);
+      setIsLoading(false);
     }
   };
 
@@ -57,24 +82,21 @@ const ChatInterface: React.FC = () => {
           ))}
         </div>
 
-        {/* Input Area */}
-        <footer className="p-4 border-t">
-          <form
-            className="flex gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}
-          >
+        {/* Input Form */}
+        <form onSubmit={handleSubmit} className="p-4 border-t">
+          <div className="flex gap-2">
             <Input
-              placeholder="Type your message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              disabled={isLoading}
               className="flex-grow"
             />
-            <Button type="submit">Send</Button>
-          </form>
-        </footer>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Sending..." : "Send"}
+            </Button>
+          </div>
+        </form>
       </div>
     </DashboardLayout>
   );
