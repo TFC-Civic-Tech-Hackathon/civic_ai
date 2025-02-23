@@ -2,7 +2,7 @@
 
 ## Live application link
 
-[![Application](https://img.shields.io/badge/codelabs-4285F4?style=for-the-badge&logo=codelabs&logoColor=white)](https://codelabs-preview.appspot.com/?file_id=1xOJo6D40dsWjctPaj2Z7uZlOG9cHrW0DRejiGDkK9XM#0)
+[![Application](https://img.shields.io/badge/Application-4285F4?style=for-the-badge&logo=codelabs&logoColor=white)](https://codelabs-preview.appspot.com/?file_id=1xOJo6D40dsWjctPaj2Z7uZlOG9cHrW0DRejiGDkK9XM#0)
 
 ## Technologies Used
 [![ReactJS](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
