@@ -1,4 +1,38 @@
 [mongodb]
-MONGODB_URL = <value>
-DATABASE_NAME = <value>
-COLLECTION_NAME = <value>
+MONGODB_URL = 
+DATABASE_NAME = 
+COLLECTION_NAME = 
+ 
+[auth-api]
+SECRET_KEY = 
+ALGORITHM = 
+ACCESS_TOKEN_EXPIRE_MINUTES = 
+ 
+[userDoc]
+COLLECTION_NAME = 
+ 
+[password]
+schemes = 
+deprecated = 
+tokenUrl = 
+ 
+[cloudinary]
+CLOUD_NAME = 
+API_KEY = 
+API_SECRET = 
+ 
+[cors]
+ALLOW_ORIGINS = 
+
+[SNOWFLAKE]
+user = 
+password = 
+account = 
+warehouse = 
+database = 
+schema = 
+role = 
+table = 
+stage = 
+file_format = 
+ 

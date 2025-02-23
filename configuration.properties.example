@@ -9,3 +9,10 @@ role =
 table = 
 stage = 
 file_format = 
+
+[PINECONE]
+pinecone_api_key = 
+index = 
+
+[OLLAMA]
+OLLAMA_API_BASE = 

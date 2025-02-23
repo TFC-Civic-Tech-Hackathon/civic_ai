@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Bell, Search, Shield, TrendingUp, Upload } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { policiesPerMonth } from "@/services/VisualizeService";
 
 
 
@@ -36,7 +37,20 @@ const Dashboard = () => {
     },
   ];
 
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // await your asynchronous code here, e.g.:
+        const response = await fetch("https://api.example.com/data");
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
   return (
     <DashboardLayout>
