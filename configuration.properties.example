@@ -1,0 +1,11 @@
+[SNOWFLAKE]
+user = 
+password = 
+account = 
+warehouse = 
+database = 
+schema = 
+role = 
+table = 
+stage = 
+file_format = 

@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 import configparser
 import jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from configs.mongo_configs import mongo_connection
 from models.User import User
+from models.LoginRequest import LoginRequest
 
 router = APIRouter()
 
@@ -101,7 +103,7 @@ async def user_signup(user: User):
 
 # Route to generate access token after login
 @router.post("/login")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(form_data: LoginRequest):
     db = mongo_connection()
     if db is None:
         raise HTTPException(

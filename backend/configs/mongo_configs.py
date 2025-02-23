@@ -11,9 +11,6 @@ def mongo_connection():
         MONGO_URI = config.get("mongodb", "MONGODB_URL", fallback=None)
         DATABASE_NAME = config.get("mongodb", "DATABASE_NAME", fallback=None)
 
-        print(MONGO_URI)
-        print(DATABASE_NAME)
-
         # Validate config values
         if not MONGO_URI or not DATABASE_NAME:
             raise ValueError("MONGODB_URL or DATABASE_NAME is missing in configuration.properties")

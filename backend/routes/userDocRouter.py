@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from models.UserDoc import UserDoc
 from configs.mongo_configs import mongo_connection
 from bson import ObjectId
 import configparser
+import cloudinary.uploader
+from configs.cloudinary_config import cloudinary
 
 router = APIRouter()
 
@@ -17,45 +19,90 @@ collection = db[config["userDoc"]["COLLECTION_NAME"]]
 
 # ✅ Create a document record
 @router.post("/", response_model=UserDoc)
-async def create_user_doc(user_doc: UserDoc):
-    # Convert Pydantic model to dictionary
-    doc_data = user_doc.dict()
+async def create_user_doc(userId: str, file: UploadFile = File(...)):
+    try:
+        # Ensure file is a PDF
+        if file.content_type != "application/pdf":
+            raise HTTPException(
+                status_code=400, detail="Only PDF files are allowed")
 
-    # Insert into MongoDB
-    result = collection.insert_one(doc_data)
-    if result.inserted_id:
-        return {**doc_data, "id": str(result.inserted_id)}
-    raise HTTPException(status_code=500, detail="Failed to create document")
+        print('Inside try block')
+        # Upload directly to Cloudinary inside "CivicHacks" folder
+        cloudinary_response = cloudinary.uploader.upload(
+            file.file,
+            resource_type="raw",  # Raw to allow any file type
+            folder="CivicHacks"   # Ensures files are stored in the "CivicHacks" folder
+        )
+
+        print('cloudinary resp: ', cloudinary_response)
+        
+        # Extract secure URL from Cloudinary response
+        cloudinary_url = cloudinary_response.get("secure_url")
+        if not cloudinary_url:
+            raise HTTPException(
+                status_code=500, detail="Failed to upload file to Cloudinary")
+
+        # Store userId and Cloudinary URL in MongoDB
+        document_entry = {
+            "userId": userId,
+            "documentLoc": cloudinary_url  # Store Cloudinary URL
+        }
+        result = collection.insert_one(document_entry)
+
+        if result.inserted_id:
+            return {
+                "message": "File uploaded successfully",
+                "userId": userId,
+                "documentLoc": cloudinary_url,
+                "documentId": str(result.inserted_id)
+            }
+        else:
+            raise HTTPException(
+                status_code=500, detail="Failed to store document info")
+    
+    except Exception as e:
+        print("Error uploading file:", e)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
-# ✅ Retrieve a document by userId
-@router.get("/{userId}", response_model=UserDoc)
-async def get_user_doc(userId: str):
-    user_doc = collection.find_one({"userId": userId})
-    if not user_doc:
-        raise HTTPException(status_code=404, detail="Document not found")
-    user_doc["_id"] = str(user_doc["_id"])  # Convert ObjectId to string
-    return user_doc
+# ✅ Get all documents for a given userId
+@router.get("/{userId}")
+async def get_all_user_docs(userId: str):
+    user_docs = list(collection.find({"userId": userId}))
+
+    if not user_docs:
+        raise HTTPException(
+            status_code=404, detail="No documents found for this userId")
+
+    # Convert ObjectId to string
+    for doc in user_docs:
+        doc["_id"] = str(doc["_id"])
+
+    return {"userId": userId, "documents": user_docs}
 
 
-# ✅ Update a document location
-@router.put("/{userId}", response_model=UserDoc)
-async def update_user_doc(userId: str, updated_data: UserDoc):
-    result = collection.find_one_and_update(
-        {"userId": userId},
-        {"$set": updated_data.dict()},
-        return_document=True
-    )
-    if not result:
-        raise HTTPException(status_code=404, detail="Document not found")
-    result["_id"] = str(result["_id"])  # Convert ObjectId to string
-    return result
+@router.get("/doc/{userDocId}", response_model=UserDoc)
+async def get_user_doc_by_id(userDocId: str):
+    try:
+        user_doc = collection.find_one({"_id": ObjectId(userDocId)})
+        if not user_doc:
+            raise HTTPException(status_code=404, detail="Document not found")
+
+        user_doc["_id"] = str(user_doc["_id"])  # Convert ObjectId to string
+        return user_doc
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid userDocId format")
 
 
-# ✅ Delete a document
-@router.delete("/{userId}")
-async def delete_user_doc(userId: str):
-    result = collection.delete_one({"userId": userId})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return {"message": "Document deleted successfully"}
+@router.delete("/doc/{userDocId}")
+async def delete_user_doc_by_id(userDocId: str):
+    try:
+        result = collection.delete_one({"_id": ObjectId(userDocId)})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Document not found")
+
+        return {"message": "Document deleted successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid userDocId format")
