@@ -1,11 +1,18 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowRight } from "lucide-react";
+import { register } from "@/services/authService";
+import { useNavigate } from "react-router-dom";
 
 const BUSINESS_VERTICALS = [
   "Technology",
@@ -31,18 +38,18 @@ export function RegisterForm() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    businessName: "",
-    vertical: "",
+    bizzName: "",
+    bizzVertical: "",
     location: "",
-    companySize: "",
+    bizzSize: "",
     password: "",
     confirmPassword: "",
   });
   const { toast } = useToast();
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Error",
@@ -51,12 +58,25 @@ export function RegisterForm() {
       });
       return;
     }
-
-    // TODO: Implement actual registration logic
-    toast({
-      title: "Registration functionality coming soon",
-      description: "This is a placeholder for the registration functionality",
-    });
+    const { confirmPassword, ...formDataToSend } = formData;
+    console.log(formDataToSend);
+    try{
+      const response = await register(formDataToSend);
+      if(response){
+        toast({
+          title: "Registration Successful",
+          description: "",
+        });
+        navigate("/dashboard")
+      }else{
+        toast({
+          title: "Registration failed",
+          description: "",
+        });
+      }
+    }catch(err){
+      console.log(err);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,22 +112,24 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="businessName">Business Name</Label>
+        <Label htmlFor="Business Name">Business Name</Label>
         <Input
-          id="businessName"
-          name="businessName"
+          id="bizzName"
+          name="bizzName"
           placeholder="Acme Inc."
-          value={formData.businessName}
+          value={formData.bizzName}
           onChange={handleChange}
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="vertical">Business Vertical</Label>
+        <Label htmlFor="bizzVertical">Business Vertical</Label>
         <Select
-          value={formData.vertical}
-          onValueChange={(value) => setFormData((prev) => ({ ...prev, vertical: value }))}
+          value={formData.bizzVertical}
+          onValueChange={(value) =>
+            setFormData((prev) => ({ ...prev, bizzVertical: value }))
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Select industry" />
@@ -135,10 +157,12 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="companySize">Company Size</Label>
+        <Label htmlFor="bizzSize">Company Size</Label>
         <Select
-          value={formData.companySize}
-          onValueChange={(value) => setFormData((prev) => ({ ...prev, companySize: value }))}
+          value={formData.bizzSize}
+          onValueChange={(value) =>
+            setFormData((prev) => ({ ...prev, bizzSize: value }))
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Select company size" />

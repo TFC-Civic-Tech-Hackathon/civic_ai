@@ -12,6 +12,7 @@ import {
   Menu,
   Moon,
   Sun,
+  ChartLine
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "@/components/theme-provider";
@@ -36,6 +37,11 @@ const sidebarItems = [
     title: "Civic Bot",
     icon: Bot,
     href: "/civic-bot",
+  },
+  {
+    title: "Insights",
+    icon: ChartLine,
+    href: "/insights",
   },
 ];
 
