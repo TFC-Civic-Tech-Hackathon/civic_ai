@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import authRouter, healthRouter, userDocRouter, chatRouter, visualizeRouter
+from routes import authRouter, healthRouter, userDocRouter, chatRouter, visualizeRouter, pdfRouter
 import configparser
 from fastapi import APIRouter
 
