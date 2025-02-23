@@ -30,9 +30,9 @@ def fetch_federal_register_documents(document_ids):
             # Get action and check for rule or notice
             action = data.get('action', '')
             if action:
-              action = action.lower()
+                action = action.lower()
             else:
-              continue
+                continue
             if any(keyword in action for keyword in ['rule', 'notice']):
                 
                 try:

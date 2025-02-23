@@ -5,13 +5,18 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup as soup
+import configparser
 
+config = configparser.ConfigParser()
+config.read('/opt/airflow/dags/configuration.properties')
+
+webdriver_url = config['SCRAPE']['remote_url']
 def scrape_data(url):
     chrome_options = Options()
     chrome_options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Remote(
-        command_executor="http://homelab.chaudharyanshul.com:4443/wd/hub", 
+        command_executor=webdriver_url, 
         options=chrome_options
     )
 
