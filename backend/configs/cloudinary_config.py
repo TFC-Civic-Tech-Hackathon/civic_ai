@@ -13,6 +13,3 @@ cloudinary.config(
     api_secret=config["cloudinary"]["API_SECRET"],
     secure=True
 )
-
-# Debugging: Check if Cloudinary is configured
-print("✅ Cloudinary Configured:", cloudinary.config().cloud_name)
