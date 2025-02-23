@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import authRouter, healthRouter, userDocRouter
+from routes import authRouter, healthRouter, userDocRouter, pdfRouter
 import configparser
 
 config = configparser.ConfigParser()
@@ -24,4 +24,5 @@ app.add_middleware(
 
 app.include_router(authRouter.router, tags=['authRoute'], prefix='/auth')
 app.include_router(userDocRouter.router, tags=['userDocRoute'], prefix='/userDoc')
+app.include_router(pdfRouter.router, tags=['pdfRoute'], prefix='/pdf')
 app.include_router(healthRouter.router, tags=['healthRoute'], prefix='')
