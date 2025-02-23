@@ -1,0 +1,31 @@
+@import url(https://fonts.bunny.net/css?family=alexandria:900);
+
+:root {
+  /* Define colors consistent with your current theme */
+  --primary-color: #0ea5e9; /* Example: Tailwind sky-500 */
+  --secondary-color: #22c55e; /* Example: Tailwind green-500 */
+  --gradient: linear-gradient(-45deg, var(--primary-color), var(--secondary-color));
+}
+
+body {
+  font-family: "Alexandria", sans-serif;
+}
+
+.main {
+  background: #ddd;
+  background-size: 300%;
+  background-image: var(--gradient);
+  animation: bg-animation 15s infinite;
+}
+
+@keyframes bg-animation {
+  0% {
+    background-position: left;
+  }
+  50% {
+    background-position: right;
+  }
+  100% {
+    background-position: left;
+  }
+}
