@@ -5,6 +5,9 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from airflow.utils.task_group import TaskGroup
 import pandas as pd
+import asyncio
+
+
 
 from fr_helper.scrape_ids import scrape_data
 from fr_helper.api_call import collect_data

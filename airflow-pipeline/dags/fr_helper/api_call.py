@@ -36,14 +36,14 @@ def fetch_federal_register_documents(document_ids):
             if any(keyword in action for keyword in ['rule', 'notice']):
                 
                 try:
-                    sub = data.get('agencies', [{}])[1].get('raw_name', 'N/A')[0],
+                    sub = data.get('agencies', [{}])[1].get('raw_name', 'N/A'),
                 except:
                     sub = None
                 
                 csv_data = {
                     'ID': data.get('document_number', 'N/A'),
                     'AGENCY': data.get('agencies', [{}])[0].get('raw_name', 'N/A'),
-                    'SUB_AGENCY': sub,
+                    'SUB_AGENCY': sub[0],
                     'ACTION': data.get('action', 'N/A'),
                     'SUMMARY': data.get('abstract', 'N/A'),
                     'DATES': data.get('dates', 'N/A'),
