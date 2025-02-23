@@ -1,4 +1,4 @@
-# PoliSight.ai
+# PoliSights.ai
 
 ## Live application link
 
@@ -23,7 +23,7 @@
 
 ## Overview
 
-PoliSight.ai is an AI-powered platform that helps small businesses stay informed about federal policy changes in real time. The system extracts policies from the Federal Register, processes them using AI, and delivers personalized recommendations and alerts to businesses based on their profile.
+PoliSights.ai is an AI-powered platform that helps small businesses stay informed about federal policy changes in real time. The system extracts policies from the Federal Register, processes them using AI, and delivers personalized recommendations and alerts to businesses based on their profile.
 
 ## Problem Statement
 
@@ -38,7 +38,7 @@ Small businesses struggle to stay informed about frequent regulatory changes tha
 Manually searching and interpreting policies is time-consuming, inefficient, and costly, putting small businesses at a disadvantage compared to large corporations with dedicated compliance teams.
 
 ### Solution:
-The objective of PoliSight.ai is to empower small businesses by providing an AI-driven policy tracking system that ensures they stay informed about relevant regulatory changes in real time. By leveraging web scraping, NLP, and vector search, the system automatically extracts policies from the Federal Register, matches them to businesses based on industry and profile, and delivers personalized alerts. A user-friendly dashboard allows businesses to search, analyze, and track policy trends, helping them make informed decisions and maintain compliance efficiently.
+The objective of PoliSights.ai is to empower small businesses by providing an AI-driven policy tracking system that ensures they stay informed about relevant regulatory changes in real time. By leveraging web scraping, NLP, and vector search, the system automatically extracts policies from the Federal Register, matches them to businesses based on industry and profile, and delivers personalized alerts. A user-friendly dashboard allows businesses to search, analyze, and track policy trends, helping them make informed decisions and maintain compliance efficiently.
 
 ## Key Features
 ✅ Real-Time Policy Alerts – Businesses receive notifications on relevant policy changes.</br>
